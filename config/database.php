@@ -45,6 +45,8 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
+            'dump' => [ 'dump_binary_path' => 'C:\wamp65\bin\mysql\mysql5.7.23\bin' // only the path, so withoutmysqldumporpg_dump`
+                        ],
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),

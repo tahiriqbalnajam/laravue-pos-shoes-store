@@ -41,6 +41,7 @@ Route::namespace('Api')->group(function() {
         Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
     });
 });
+Route::get('backupdb', 'SettingController@backupdb');
 Route::get('stock_by_manufacturer', 'ProductController@stock_by_manufacturer');
 Route::get('stock_value_report', 'ProductController@stock_value_report');
 Route::get('get_stock_print', 'ProductController@get_stock_print');

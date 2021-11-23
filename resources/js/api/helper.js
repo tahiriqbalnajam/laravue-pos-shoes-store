@@ -31,4 +31,10 @@ export function dailystock() {
     method: 'get',
   });
 }
+export function backup() {
+  return request({
+    url: '/backupdb',
+    method: 'get',
+  });
+}
 

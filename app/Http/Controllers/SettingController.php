@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Settings;
-use App\Laravue\JsonResponse;
 use Exception;
+use App\Settings;
+use Illuminate\Http\Request;
+use App\Laravue\JsonResponse;
+use Illuminate\Support\Facades\Artisan;
 
 class SettingController extends Controller
 {
@@ -71,5 +72,10 @@ class SettingController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    function backupdb($database = null){
+        Artisan::call("backup:run");
+        return response()->json(new JsonResponse(['backup' => '']));
     }
 }

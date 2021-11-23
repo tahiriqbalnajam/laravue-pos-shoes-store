@@ -98,10 +98,25 @@
             </el-col>
           </el-row>
         </el-tab-pane>
+        <el-tab-pane label="Backup" name="fifth">
+          <el-row>
+            <el-col :span="24">
+              <el-card shadow="always">
+                <el-row>
+                  <el-col :span="24">
+                    <el-form-item label="Backup">
+                      <el-button type="danger" :loading="loading" @click="backup()">Click to Backup</el-button>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
       </el-tabs>
       <el-row style="margin-top:20px;">
         <el-col :span="24">
-          <el-button type="primary" @click="saveSettings()">Save Settings</el-button>
+          <el-button type="primary" @click="saveSettings()" size="big">Save Settings</el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -109,6 +124,7 @@
 </template>
 <script>
 import Resource from '@/api/resource';
+import { backup } from '@/api/helper';
 const setng = new Resource('settings');
 const sizecolorRes = new Resource('variants');
 export default {
@@ -117,6 +133,7 @@ export default {
   directives: { },
   data() {
     return {
+      loading: false,
       print_sizes: [
         {
           value: 'a4',
@@ -170,6 +187,15 @@ export default {
       await sizecolorRes.store(this.sizecolor);
       this.sizecolor.color = '';
       this.sizecolor.size = '';
+    },
+    async backup() {
+      this.loading = true;
+      await backup();
+      this.loading = false;
+      this.$message({
+        type: 'success',
+        message: 'Backup generated "storage/app/Laravel".',
+      });
     },
   },
 };
