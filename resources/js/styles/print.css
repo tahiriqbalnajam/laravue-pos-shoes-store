@@ -1,0 +1,48 @@
+.invoice_header {
+  border-bottom: 5px double #000;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+.company_name {
+	font-size: 22px;
+	font-weight: bold;
+}
+.address {
+	font-size: 15px;
+  font-weight: bold;
+}
+.phone {
+	font-size: 14px;
+	font-weight: bold;
+}
+.sale_products {
+  margin:10px 0  10px 0;
+}
+.sub-heading {
+	font-weight: bold;
+}
+.customer-detail {
+	border-collapse: collapse;
+  width: 100%;
+}
+.customer-detail th {
+	text-align: right;
+}
+.customer-detail tr td, .customer-detail th {
+	border: 1px solid #000;
+  padding: 5px;
+}
+.bill-final td, .bill-final th {
+  background: #c7c7c7;
+}
+.invoice-note {
+  margin-top: 10px;
+  color: rgb(159, 155, 155);
+  font-size: 13px;
+}
+.invoice-heading {
+	text-align: right;
+	font-weight: bold;
+	text-decoration: underline;
+	font-size: 23px;
+}
