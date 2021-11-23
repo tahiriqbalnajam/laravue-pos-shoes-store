@@ -92,9 +92,8 @@
                   :value="product.id"
                 >
                   <span style="float: left">{{ product.name }}</span>
-                  <span style="float: left; margin-left:50px; color: #8492a6; font-size: 13px">Code: {{ product.code }}</span>
-                  <span style="float: left; margin-left:50px; color: #8492a6; font-size: 13px">Category: {{ product.category.title }}</span>
-                  <span style="float: left; margin-left:50px; color: #8492a6; font-size: 13px">UOM: {{ product.uom.name }}</span>
+                  <span style="float: left; margin-left:50px; color: #8492a6; font-size: 13px" v-if="product.size">Size: {{ product.size }}</span>
+                  <span style="float: left; margin-left:50px; color: #8492a6; font-size: 13px" v-if="product.color">Color: {{ product.color }}</span>
                   <span style="float: right; color: red; font-size: 13px">Price: {{ product.purchase_price }}</span>
                 </el-option>
               </el-select>

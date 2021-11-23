@@ -14,7 +14,7 @@ class SaleProducts extends Model
 
     public function product()
     {
-        return $this->belongsTo('App\Product')->select('id','name', 'code');
+        return $this->belongsTo('App\Product')->select('id','name', 'code', 'size', 'color');
 
     }
     public function batches(){

@@ -20,6 +20,7 @@ class ProductController extends Controller
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $keyword = $request->get('keyword');
+        $search = $request->get('search');
         $products = Product::select('*')
                             ->with(array('category','uom', 'manufacturer'))
                             ->withCount(['inventory as purchase' => function($query){
@@ -36,6 +37,9 @@ class ProductController extends Controller
                             })
                             ->when($manufacture_id, function ($query) use ($manufacture_id) {
                                 return $query->where('manufacturer_id', '=', $manufacture_id);     
+                             })
+                             ->when($search, function ($query){
+                                return $query->where('status', '=', 'enable');     
                              })
                              ->where('type', '!=', 'variable')
                             ->paginate( $limit);
@@ -74,14 +78,15 @@ class ProductController extends Controller
                 $variants = $request->get('variants');
                 foreach($variants as $variant) {
                     $sproduct = new Product();
+                    $code = ($variant['code']) ?? '';
                     $sproduct->name =  $request->get('name');
-                    $sproduct->code =  $request->get('code').$variant['code'];
+                    $sproduct->code =  $request->get('code').$code;
                     $sproduct->purchase_price =  $variant['purchase_price'];
                     $sproduct->sale_price =  $variant['sale_price'];
                     $sproduct->wholesale_price =  $variant['wholesale_price'];
                     $sproduct->category_id = $product->category_id;
-                    $sproduct->color = $variant['selected_color'];
-                    $sproduct->size = $variant['selected_size'];
+                    $sproduct->color = ($variant['selected_color']) ?? '';
+                    $sproduct->size = ($variant['selected_size']) ?? '';
                     $sproduct->manufacture_id =  $request->get('manufacture_id');
                     $sproduct->variable_product_id = $product->id;
                     $sproduct->save();
@@ -89,7 +94,7 @@ class ProductController extends Controller
                         $inventory = new Inventories();
                         $inventory->outlet_id = '1';
                         $inventory->product_id = $sproduct->id;
-                        $inventory->quantity = $request->get('quantity');
+                        $inventory->quantity = $variant['quantity'];
                         $inventory->inventory_type = 'manual';
                         $inventory->save();
                     } 
@@ -148,8 +153,8 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
        // dd($request->all());
-        $measure = $request->get('uom');
-        $measure = $measure['id'];
+        $measure = ($request->get('uom')) ?? null ;
+        $measure = ($measure) ? $measure['id']: null;
         $validatedData = $request->validate([
             //'name' => 'required|unique:products,name,'.$product->id,
             'name' => 'required',

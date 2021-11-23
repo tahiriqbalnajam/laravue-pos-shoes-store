@@ -41,11 +41,15 @@
       </table>
       <table class="tblwdborder idlprint-table">
         <tr class="textcenter">
-          <th>Product</th><th>UOM</th><th>Price</th><th>Qty</th><th>Disc1</th><th>Net Amount</th>
+          <th>Product</th><th>Price</th><th>Qty</th><th>Disc1</th><th>Net Amount</th>
         </tr>
         <tr v-for="product in sale.products" :key="product.product.id">
-          <td width="50%">{{ product.product.code }} {{ product.product.name }}</td>
-          <td align="right" valign="center">{{ product.product.uom }}</td>
+          <td width="50%">
+            <span><b>{{ product.product.name }}</b> (</span>
+            <span v-if="product.product.size"> S: <b>{{ product.product.size }}</b>,</span>
+            <span v-if="product.product.color"> C: <b>{{ product.product.color }}</b></span>
+            )
+          </td>
           <td align="right" valign="center">{{ product.price }}</td>
           <td align="right" valign="center">{{ product.quantity }}</td>
           <td align="right" valign="center">{{ product.discount1 }}</td>
@@ -87,6 +91,7 @@
             </table>
           </td>
         </tr>
+        <tr><td colspan="2" style="text-align: center;font-size: 10px;padding-top: 12px;">Software developed by IDLBridge - 03457050405</td></tr>
       </table>
     </div>
     <el-button v-shortkey="['ctrl', 'c']" type="primary" plain @click="print">Print</el-button>

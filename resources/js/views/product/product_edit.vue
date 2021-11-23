@@ -47,24 +47,6 @@
                 inactive-value="disable"
               />
             </el-form-item>
-            <el-form-item label="UOM" prop="title">
-              <el-select
-                v-model="product.uom.id"
-                filterable
-                remote
-                reserve-keyword
-                placeholder="Please enter a keyword"
-                :remote-method="getunits"
-                :loading="loading"
-              >
-                <el-option
-                  v-for="unit in units"
-                  :key="unit.id"
-                  :label="unit.name"
-                  :value="unit.id"
-                />
-              </el-select>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" :loading="loading" @click="onSubmit('productform')"><span v-if="product.id == ''">Create</span><span v-else>Update</span></el-button>
               <el-button>Cancel</el-button>

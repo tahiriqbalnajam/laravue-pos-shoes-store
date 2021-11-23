@@ -80,8 +80,8 @@
                   <el-select
                     v-model="supvari.selected_color"
                     filterable
-                    allow-create
                     default-first-option
+                    clearable
                     placeholder="Choose color">
                     <el-option
                       v-for="color in supvari.colors"
@@ -97,7 +97,7 @@
                   <el-select
                     v-model="supvari.selected_size"
                     filterable
-                    allow-create
+                    clearable
                     default-first-option
                     placeholder="Choose size">
                     <el-option
@@ -232,14 +232,33 @@ export default {
           sale_price: 0,
           wholesale_price: 0,
           colors: [
+            'Bige',
             'Black',
+            'Blue',
             'Brown',
+            'Camel',
+            'Cofey',
+            'Fawn',
+            'Golden',
+            'Gray',
+            'Green',
+            'Mustard',
+            'Maroon',
+            'Mint',
+            'Navy',
+            'Natural',
+            'Peach',
+            'Pink',
             'Red',
+            'Skin',
+            'Sky bule',
+            'Tan',
+            'Yellow',
+            'White Maroon',
           ],
           sizes: [
-            '40',
-            '41',
-            '42',
+            '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30',
+            '31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49'
           ],
         }],
       },
@@ -249,14 +268,33 @@ export default {
         sale_price: 0,
         wholesale_price: 0,
         colors: [
+          'Bige',
           'Black',
+          'Blue',
           'Brown',
+          'Camel',
+          'Cofey',
+          'Fawn',
+          'Golden',
+          'Gray',
+          'Green',
+          'Mustard',
+          'Maroon',
+          'Mint',
+          'Navy',
+          'Natural',
+          'Peach',
+          'Pink',
           'Red',
+          'Skin',
+          'Sky bule',
+          'Tan',
+          'Yellow',
+          'White Maroon',
         ],
         sizes: [
-          '40',
-          '41',
-          '42',
+          '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30',
+          '31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49'
         ],
       },
       category: {
@@ -391,7 +429,55 @@ export default {
         if (valid) {
           this.loading = true;
           const { data } = addPro.store(this.product).then(result => {
-            this.product = {};
+            this.product = {
+              id: '',
+              name: '',
+              uid: '',
+              type: 'variable',
+              purchase_price: '',
+              sale_price: '',
+              wholesale_price: '',
+              quantity: 1,
+              reorder: 1,
+              category_id: '',
+              manufacture_id: '',
+              unit: '',
+              variants: [{
+                quantity: 1,
+                purchase_price: 0,
+                sale_price: 0,
+                wholesale_price: 0,
+                colors: [
+                  'Bige',
+                  'Black',
+                  'Blue',
+                  'Brown',
+                  'Camel',
+                  'Cofey',
+                  'Fawn',
+                  'Golden',
+                  'Gray',
+                  'Green',
+                  'Mustard',
+                  'Maroon',
+                  'Mint',
+                  'Navy',
+                  'Natural',
+                  'Peach',
+                  'Pink',
+                  'Red',
+                  'Skin',
+                  'Sky bule',
+                  'Tan',
+                  'Yellow',
+                  'White Maroon',
+                ],
+                sizes: [
+                  '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30',
+                  '31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49'
+                ],
+              }],
+            };
             this.loading = false;
             this.$message({
               message: 'Added Successfully.',

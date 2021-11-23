@@ -387,6 +387,7 @@ export default {
         limit: 15,
         keyword: '',
         select: '',
+        search: 'yes',
       },
       customers: null,
       staffers: [],
@@ -799,7 +800,7 @@ export default {
 }
 .small {
   font-weight: normal;
-  font-size:10px;
+  font-size:13px;
 }
 .cartheader {
   font-weight: bold;
