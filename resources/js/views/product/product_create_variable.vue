@@ -22,7 +22,7 @@
             <el-form-item label="Code Start">
               <el-input v-model="product.code" clearable />
             </el-form-item>
-            <el-form-item label="Name" prop="name">
+            <el-form-item label="Name">
               <el-input v-model="product.name" clearable />
             </el-form-item>
             <el-form-item label="Category" prop="category">
@@ -72,7 +72,7 @@
             <el-row v-for="(supvari, index) in product.variants"  :key="index" :gutter="10">
               <el-col :span="3">
                 <el-form-item label="Code">
-                  <el-input v-model="supvari.code" type="text" step="any" min="0"  />
+                  <el-input ref="code" v-model="supvari.code" type="text" step="any" min="0" @keyup.native.enter="(supvari.code != '') ? focusInput('quantity') : ''" />
                 </el-form-item>
               </el-col>
               <el-col :span="3">
@@ -94,24 +94,12 @@
               </el-col>
               <el-col :span="3">
                 <el-form-item label="Size">
-                  <el-select
-                    v-model="supvari.selected_size"
-                    filterable
-                    clearable
-                    default-first-option
-                    placeholder="Choose size">
-                    <el-option
-                      v-for="size in supvari.sizes"
-                      :key="size"
-                      :label="size"
-                      :value="size"
-                    />
-                  </el-select>
+                  <el-input v-model="supvari.selected_size" />
                 </el-form-item>
               </el-col>
               <el-col :span="3">
                 <el-form-item label="Qty">
-                  <el-input v-model="supvari.quantity" type="number" step="any" min="0"  />
+                  <el-input ref="quantity" v-model="supvari.quantity" type="number" step="any" min="0"  />
                 </el-form-item>
               </el-col>
               <el-col :span="3">
@@ -308,7 +296,7 @@ export default {
       },
       categories: null,
       rules: {
-        name: [
+        name12: [
           { required: true, message: 'Please enter product name', trigger: 'blur' },
           { min: 3, max: 50, message: 'Length should be 3 to 50', trigger: 'blur' },
         ],
@@ -337,8 +325,12 @@ export default {
     this.getunits();
   },
   methods: {
+    focusInput(refrr) {
+      console.log(refrr);
+      this.$refs[refrr].focus();
+    },
     addVariant() {
-      this.product.variants.push({ ...this.singvariant });
+      this.product.variants.push({ ...this.product.variants[0] });
     },
     removeVariant(index) {
       this.product.variants = this.product.variants.filter((vari,i) => i !== index);
@@ -413,6 +405,7 @@ export default {
     async addUnit() {
       if (this.unitsofmeasure.name.length) {
         const { data } = unit.store(this.unitsofmeasure).then(result => {
+
           this.product.unit = result.id;
           this.$message({
             message: 'unit added Successfully.',

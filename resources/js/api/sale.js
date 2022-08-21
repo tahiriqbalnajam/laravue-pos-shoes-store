@@ -32,3 +32,11 @@ export function getwheatLastInoice(id) {
     method: 'get',
   });
 }
+
+export function exchangeProducts(query) {
+  return request({
+    url: '/exchange_products',
+    method: 'post',
+    data: query,
+  });
+}

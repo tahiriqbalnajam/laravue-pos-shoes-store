@@ -88,6 +88,35 @@ export const constantRoutes = [
       },
     ],
   },
+  /* {
+    path: '/profile',
+    component: Layout,
+    redirect: '/profile/edit',
+    children: [
+      {
+        path: 'edit',
+        component: () => import('@/views/users/SelfProfile'),
+        name: 'SelfProfile',
+        meta: { title: 'userProfile', icon: 'user', noCache: true },
+      },
+    ],
+  },
+     {
+    path: '/guide',
+    component: Layout,
+    redirect: '/guide/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/guide/index'),
+        name: 'Guide',
+        meta: { title: 'guide', icon: 'guide', noCache: true },
+      },
+    ],
+  },*/
+];
+
+export const asyncRoutes = [
   {
     path: '/products',
     component: Layout,
@@ -139,14 +168,34 @@ export const constantRoutes = [
     meta: {
       title: 'Sale',
       icon: 'el-icon-s-platform',
-      permissions: ['view menu element ui'],
+      permissions: ['view menu sale'],
     },
     children: [
       {
         path: 'index',
         component: () => import('@/views/sale/sale_index'),
         name: 'Sale',
-        meta: { title: 'Sale', icon: 'shopping', noCache: true },
+        meta: { title: 'Sale', icon: 'shopping', noCache: true, permissions: ['view menu sale'] },
+      },
+    ],
+  },
+  {
+    path: '/exchange',
+    component: Layout,
+    redirect: '/exchange/index',
+    name: 'Exchange',
+    alwaysShow: false,
+    meta: {
+      title: 'Exchange',
+      icon: 'el-icon-sort',
+      permissions: ['view menu exchange'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/exchange/ExchangeIndex'),
+        name: 'Exchange',
+        meta: { title: 'Exchange', icon: 'exchange', noCache: true },
       },
     ],
   },
@@ -192,7 +241,7 @@ export const constantRoutes = [
     meta: {
       title: 'Accounts',
       icon: 'accounts',
-      permissions: ['view menu element ui'],
+      permissions: ['view menu accounts'],
     },
     children: [
       {
@@ -224,7 +273,7 @@ export const constantRoutes = [
     meta: {
       title: 'Reports',
       icon: 'documentation',
-      permissions: ['view menu element ui'],
+      permissions: ['view menu reports'],
     },
     children: [
       {
@@ -254,8 +303,20 @@ export const constantRoutes = [
       {
         path: 'stock_value',
         component: () => import('@/views/reports/StockValue'),
-        name: 'Stock Total Value',
-        meta: { title: 'Stock Total Value', icon: 'component', noCache: true },
+        name: 'Stock Purchase Value',
+        meta: { title: 'Stock Purchase Value', icon: 'component', noCache: true,  roles: ['admin'] },
+      },
+      {
+        path: 'stock_retail_value',
+        component: () => import('@/views/reports/StockRetailValue'),
+        name: 'Stock Retial Value',
+        meta: { title: 'Stock Retial Value', icon: 'component', noCache: true },
+      },
+      {
+        path: 'grand_report',
+        component: () => import('@/views/reports/GrandReport'),
+        name: 'Grand Report',
+        meta: { title: 'Grand Report', icon: 'component', noCache: true },
       },
     ],
   },
@@ -272,35 +333,6 @@ export const constantRoutes = [
       },
     ],
   },
-  /* {
-    path: '/profile',
-    component: Layout,
-    redirect: '/profile/edit',
-    children: [
-      {
-        path: 'edit',
-        component: () => import('@/views/users/SelfProfile'),
-        name: 'SelfProfile',
-        meta: { title: 'userProfile', icon: 'user', noCache: true },
-      },
-    ],
-  },
-     {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'guide', icon: 'guide', noCache: true },
-      },
-    ],
-  },*/
-];
-
-export const asyncRoutes = [
   adminRoutes,
   // permissionRoutes,
   // componentRoutes,

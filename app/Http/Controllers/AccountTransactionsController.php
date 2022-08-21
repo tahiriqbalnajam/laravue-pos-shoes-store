@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use DB;
 use App\AccountTransactions as ATrans;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class AccountTransactionsController extends Controller
 {
@@ -47,6 +48,7 @@ class AccountTransactionsController extends Controller
             'jama_account' => 'required|numeric',
             'naam_account' => 'required|numeric',
             'amount' => 'required|numeric',
+            'sale_id' => (string) Str::orderedUuid(),
         ]);
         
         $transaction = new ATrans();
@@ -113,7 +115,11 @@ class AccountTransactionsController extends Controller
                             ->selectRaw('sum(amount) as amount, jama_account, naam_account,comments, entry_by, created_at, updated_at')
                             ->orderby('created_at', 'desc')
                             ->orderby('sale_id', 'desc')
-                            ->groupBy('naam_account','sale_id','purchase_id')
+                            ->groupBy(
+                                DB::raw(
+                                    'if (sale_id IS NULL, id, sale_id),naam_account,sale_id,purchase_id,naam_account'
+                                    )
+                            )
                             //->toSql($limit); 
                             ->paginate($limit); 
                             //echo $transactions;

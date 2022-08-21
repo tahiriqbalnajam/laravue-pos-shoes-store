@@ -69,6 +69,16 @@
             </el-form-item>
           </el-card>
         </el-col>
+        <el-col :span="8">
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>Attributes</span>
+            </div>
+            <el-form-item label="Size" prop="purchase_price">
+              <el-input v-model="product.size" type="number" step="any" min="0" />
+            </el-form-item>
+          </el-card>
+        </el-col>
       </el-row>
     </el-form>
     <el-dialog title="Add Category" :visible.sync="showcategorypopup">

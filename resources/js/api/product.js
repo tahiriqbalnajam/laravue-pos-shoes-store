@@ -49,6 +49,13 @@ export function saveVisitTest(id, patient_id, visitid){
     method: 'post',
   });
 }
+export function editPrices(pricedata){
+  return request({
+    url: '/edit_price',
+    method: 'post',
+    data: pricedata,
+  });
+}
 export function getPatienttest(){
   return request({
     url: 'getVisitTest/',

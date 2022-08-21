@@ -16,7 +16,7 @@
       <table style="width:100%">
         <tr>
           <td style="width:50%">
-            <table v-if="sale.customer" class="tblwdborder">
+            <table v-if="sale.customer && sale.customer.name != 'Running Customer'" class="tblwdborder">
               <tr>
                 <th>Party Name:</th>
                 <td>{{ sale.customer.name }}</td>
@@ -34,6 +34,10 @@
                 <td>{{ sale.id }}</td>
                 <th>Date:</th>
                 <td>{{ sale.created_at | dateformat }}</td>
+              </tr>
+              <tr v-show="sale.saleman.name != 'none'">
+                <th>Saleman</th>
+                <td colspan="3">{{ sale.saleman.name }}</td>
               </tr>
             </table>
           </td>
@@ -60,7 +64,7 @@
         <tr>
           <td style="width:50%">
             <div class="sub-heading" style="font-weight: bold;">Total Items: {{ sale.products.length }}</div>
-            <div class="invoice-note" style="margin-top: 10px;color: rgb(159, 155, 155);font-size: 13px;">{{ settings.invoice_footer }}</div>
+            <div class="invoice-note" style="margin-top: 10px;color:#000;font-size: 13px;">{{ settings.invoice_footer }}</div>
           </td>
           <td style="width:30%">
             <table class="tblwdborder footerstat">
@@ -110,15 +114,11 @@ export default {
   printSize: '3in',
   filters: {
     dateformat: (date) => {
-      return (!date) ? '' : moment(date).format('DD/MM/YYYY');
+      return (!date) ? '' : moment(date).format('DD/MM/YYYY hh:mm');
     },
   },
   props: {
     invoiceid: {
-      type: Number,
-      required: true,
-    },
-    paidamount: {
       type: Number,
       required: true,
     },
@@ -165,7 +165,7 @@ export default {
       this.printSize = this.settings.print_size;
     },
     async getSale(id) {
-      this.prev = this.paidamount;
+      //this.prev = this.paidamount;
       const { data } = await salePro.get(id);
       this.sale = data.sale;
       this.prev = this.sale.previous_balance;
@@ -281,7 +281,7 @@ export default {
 }
 .invoice-note {
   margin-top: 10px;
-  color: rgb(159, 155, 155);
+  color: rgb(0, 0, 0);
   font-size: 13px;
 }
 .invoice-heading {

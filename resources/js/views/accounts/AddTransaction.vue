@@ -85,7 +85,17 @@ export default {
   name: 'AddTransaction',
   components: { },
   directives: { },
-  props: { showdrawer: { type: Boolean }},
+  props: {
+    showdrawer: { type: Boolean },
+    accountid: {
+      type: Number,
+      default: null,
+    },
+    accountTitle: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       loading: false,
@@ -118,11 +128,15 @@ export default {
         return this.showdrawer;
       },
       set: function(newValue) {
+        this.accounts = { id: this.accountid, name: this.accountTitle };
         return newValue;
       },
     },
   },
   created() {
+    if (this.accountid) {
+      this.accounts = [{ id: this.accountid, name: this.accountTitle }];
+    }
   },
   mounted() {
     this.drawer = this.showdrawer;

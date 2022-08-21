@@ -17,6 +17,12 @@ class Sale extends Model
         return $this->belongsTo('App\Accounts')->select(array('id', 'name','address'));
 
     }
+
+    public function saleman()
+    {
+        return $this->belongsTo('App\Accounts', 'saleman_id')->select(array('id', 'name'))->withDefault(['name' => 'none']);
+
+    }
     public function batches(){
 
         return $this->hasMany('App\Batch')->select(array('id','product_id','batch_no','exp_date'));

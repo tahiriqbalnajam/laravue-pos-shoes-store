@@ -40,23 +40,38 @@
           </el-button>
         </el-col>
         <el-col :span="12" style="text-align:right">
-        <!--<el-col :xs="8" :sm="6" :md="4" :lg="8" :xl="8">-->
-          <strong v-if="totalsale">Sale:</strong><el-tag v-if="totalsale" type="warning" effect="dark" class="ttlstock">{{ totalsale }}</el-tag>
-          <strong v-if="salereturn">Return:</strong><el-tag v-if="salereturn" type="danger" effect="dark" class="ttlstock">{{ salereturn }}</el-tag>
-          <strong v-if="grandtotal">Total:</strong><el-tag v-if="grandtotal" type="primary" effect="dark" class="ttlstock">{{ grandtotal }}</el-tag>
-          <strong v-if="totalprofit">Total Profit:</strong><el-tag v-if="totalprofit" type="success" effect="dark" class="ttlstock">{{ totalprofit }}</el-tag>
+          <table class="sale_report_detail">
+            <tr>
+              <th v-if="totalsale"><el-tag v-if="totalsale" type="warning" effect="dark" class="ttlstock">Sale</el-tag></th>
+              <th v-if="salereturn"><el-tag v-if="salereturn" type="danger" effect="dark" class="ttlstock">Return</el-tag></th>
+              <th v-if="total_discount"><el-tag type="danger" effect="dark" class="ttlstock">Discount</el-tag></th>
+              <th v-if="grandtotal"><el-tag v-if="grandtotal" type="primary" effect="dark" class="ttlstock">Total</el-tag></th>
+              <th v-if="totalprofit && checkRole(['admin'])"><el-tag v-if="grandtotal" type="success" effect="dark" class="ttlstock">Total Profit</el-tag></th>
+            </tr>
+            <tr>
+              <td v-if="totalsale">{{ totalsale }}</td>
+              <td v-if="salereturn">{{ salereturn }}</td>
+              <td v-if="total_discount">{{ total_discount }}</td>
+              <td v-if="grandtotal">{{ grandtotal }}</td>
+              <td v-if="totalprofit && checkRole(['admin'])">{{ totalprofit }}</td>
+            </tr>
+          </table>
         </el-col>
       </el-row>
     </div>
     <!-- Table start here -->
+    <el-button style="margin-bottom: 10px;" type="danger" icon="el-icon-arrow-down" @click="toggleExpand">
+      Expand Rows
+    </el-button>
     <el-table
+      ref="mainTbl"
       :data="list"
       stripe
       border
       style="width: 100%"
       size="mini"
     >
-      <el-table-column type="expand">
+      <el-table-column ref="expadableTbl" type="expand">
         <template slot-scope="props">
           <el-table :data="props.row.products" border stripe>
             <el-table-column label="Product" prop="product.name" />
@@ -118,9 +133,9 @@
 </template>
 <script>
 import Pagination from '@/components/Pagination';
+import checkRole from '@/utils/role';
 import Resource from '@/api/resource';
 import moment from 'moment';
-import purchase_indexVue from '../purchase/purchase_index.vue';
 const customer = new Resource('customer');
 const saleReso = new Resource('sale');
 import Printinvoice from '../sale/print';
@@ -130,7 +145,7 @@ export default {
   directives: { },
   filters: {
     dateformat: (date) => {
-      return (!date) ? '' : moment(date).format('DD MMM, YYYY');
+      return (!date) ? '' : moment(date).format('DD MMM, YYYY hh:ss');
     },
   },
   data() {
@@ -139,6 +154,7 @@ export default {
       list: null,
       totalsale: 0,
       salereturn: 0,
+      discount: 0,
       totalprofit: 0,
       profit_sale: [],
       return_sale: [],
@@ -193,6 +209,12 @@ export default {
     this.getList();
   },
   methods: {
+    checkRole,
+    toggleExpand() {
+      this.list.forEach(row => {
+        this.$refs.mainTbl.toggleRowExpansion(row);
+      });
+    },
     todayDate() {
       var today = new Date();
       var dd = String(today.getDate()).padStart(2, '0');
@@ -215,8 +237,10 @@ export default {
       });
       this.profit_sale = data.total_sale_profit;
       this.return_sale = data.total_return_profit;
+      this.discount = data.discount;
       this.totalprofit = this.profit_sale.map(element => parseInt(element.total_sale_profit)).reduce((a, b) => a + b, 0);
       this.return_sale = this.return_sale.map(element => parseInt(element.total_return_profit)).reduce((a, b) => a + b, 0);
+      this.total_discount = this.discount.map(element => parseInt(element.discount)).reduce((a, b) => a + b, 0);
       this.totalprofit = this.totalprofit - this.return_sale;
       this.totalprofit.toFixed(2);
     },
@@ -259,5 +283,9 @@ export default {
     font-weight: bold;
     font-size: 18px;
     margin-left: 10px;
+  }
+  .sale_report_detail >>> td {
+    font-size: 15px;
+    font-weight: bold;
   }
 </style>

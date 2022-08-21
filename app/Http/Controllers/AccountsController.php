@@ -66,9 +66,10 @@ class AccountsController extends Controller
         $customer = new Accounts([
             'name' => $request->get('name'),
             'phone' => $request->get('phone') ?? '' ,
+            'saleman_profit' => $request->get('saleman_profit') ?? '0' , 
             'area_id' => $request->get('area_id') ?? '',
             'address' => $request->get('address') ?? '',
-            'account_type_id'=> $request->get('type') ?? '1' ,
+            'account_type_id'=> $request->get('account_type') ?? '1' ,
         ]);
         $customer->save();
         return response()->json(new JsonResponse(['accounts' => [$customer]]));
@@ -112,6 +113,7 @@ class AccountsController extends Controller
         $customer = Accounts::find($request->id);
         $customer->name = $request->name;
         $customer->phone = $request->phone;
+        $customer->saleman_profit = $request->saleman_profit ?? '0';
         $customer->address = $request->address;
         $customer->account_type_id = $request->account_type;
         $customer->save();

@@ -62,7 +62,7 @@
       </el-col>
     </el-row>
     <pagination v-show="totalrecords>0" :total="totalrecords" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
-    <add-transaction :showdrawer="drawer" :if="drawer" @toggledrawer="handelDrawer" />
+    <add-transaction v-if="drawer" :showdrawer="drawer" @toggledrawer="handelDrawer" />
   </div>
 </template>
 <script>

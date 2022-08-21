@@ -36,8 +36,12 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="danger" icon="el-icon-magic-stick" @click="handleImport">
         Import Products
       </el-button>
+      <el-button v-if="checkRole(['admin'])" :disabled="pricechange.multipleSelection.length <= 0" class="filter-item" style="margin-left: 10px;" type="warning" icon="el-icon-edit" @click="dialogVisible = true">
+        Change Price
+      </el-button>
     </div>
-    <el-table :data="list" style="width: 100%" :row-class-name="tableRowClassName">
+    <el-table :data="list" style="width: 100%" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" />
       <el-table-column label="Code" prop="code" />
       <el-table-column label="Name" prop="name" sortable />
       <el-table-column label="Category" prop="category.title" />
@@ -111,6 +115,17 @@
       </el-table>
       <pagination v-show="query.total>0" :total="queryy.total" :page.sync="queryy.page" :limit.sync="queryy.limit" @pagination="handleStock(stock.product_id)" />
     </el-drawer>
+    <el-dialog
+      title="Change Price"
+      :visible.sync="dialogVisible"
+      width="30%">
+      <span>Enter New Price</span>
+      <el-input-number v-model="pricechange.new_price" controls-position="right" :min="1" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button :disabled="pricechange.new_price == ''" type="primary" :loading="loadingprice" @click="changePrice()" >Change Now</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -121,6 +136,7 @@ import Resource from '@/api/resource';
 import { getStock } from '@/api/product';
 import { addStock } from '@/api/product';
 import { getStockbyid } from '@/api/product';
+import { editPrices } from '@/api/product';
 const customer = new Resource('manufacturer');
 const addPro = new Resource('product');
 export default {
@@ -129,6 +145,8 @@ export default {
   directives: { },
   data() {
     return {
+      dialogVisible: false,
+      loadingprice: false,
       list: null,
       total: 0,
       loading: true,
@@ -166,6 +184,10 @@ export default {
       },
       drawer: {
         direction: 'left',
+      },
+      pricechange: {
+        multipleSelection: [],
+        new_price: '',
       },
     };
   },
@@ -210,6 +232,13 @@ export default {
     search_data: _.debounce(function(e) {
       this.getList();
     }, 500),
+    async changePrice() {
+      this.loadingprice = true;
+      await editPrices(this.pricechange);
+      this.loadingprice = false;
+      this.dialogVisible = false;
+      this.getList();
+    },
     async handleStock(id, name = '') {
       this.showstock = true;
       this.stock.product_id = id;
@@ -247,6 +276,9 @@ export default {
     },
     changeDate(date) {
       return moment(date).format('DD MMM, YYYY');
+    },
+    handleSelectionChange(val) {
+      this.pricechange.multipleSelection = val.map(prod => prod.id);
     },
   },
 };

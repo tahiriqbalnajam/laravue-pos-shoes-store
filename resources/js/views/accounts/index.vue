@@ -92,6 +92,7 @@
           {{ $t('table.search') }}
         </el-button>
         <el-button type="primary" plain @click="print">Print</el-button>
+        <el-button type="primary" plain @click="addtransactionshow = true">Add Transaction</el-button>
       </div>
       <el-card class="box-card">
         <div class="total-records-detail">
@@ -136,6 +137,7 @@
       type="error"
       effect="dark"
     />
+    <add-transaction v-if="addtransactionshow" :showdrawer="addtransactionshow" :accountid="selected_account" :account-title="title" @toggledrawer="closeTranaction" />
   </div>
 </template>
 <script>
@@ -153,10 +155,11 @@ import { parseTime } from '@/utils';
 import moment from 'moment';
 import Pagination from '@/components/Pagination';
 import AddAccount from './AddAccount';
+import AddTransaction from './AddTransaction';
 export default {
   name: 'Customer',
   directives: { waves },
-  components: { Pagination, AddAccount },
+  components: { Pagination, AddAccount, AddTransaction },
   filters: {
     dateformat: (date) => {
       return (!date) ? '' : moment(date).format('DD MMM, YYYY');
@@ -167,6 +170,7 @@ export default {
   }),
   data() {
     return {
+      addtransactionshow: false,
       accountid: null,
       balancetodate: 0,
       defaultDate: new Date().toJSON().slice(0, 10).replace(/-/g, '/'),
@@ -181,8 +185,8 @@ export default {
       gridData: [],
       showAlert: false,
       newLength: '',
-      title: '',
-      selected_account: '',
+      title: null,
+      selected_account: null,
       option: [],
       pickerOptions: {
         shortcuts: [{
@@ -398,6 +402,9 @@ export default {
       var yyyy = today.getFullYear();
       today = yyyy + '-' + mm + '-' + dd;
       return today;
+    },
+    closeTranaction() {
+      this.addtransactionshow = false;
     },
   },
 };

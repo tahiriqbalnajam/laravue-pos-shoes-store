@@ -41,6 +41,9 @@
               <el-radio :label="4">General</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item v-show="account.account_type == 3" label="Saleman Profit %" prop="Saleman Profit %">
+            <el-input v-model="account.saleman_profit" />
+          </el-form-item>
           <el-form-item label="Select Area">
             <el-select v-model="account.area_id" filterable placeholder="Select">
               <el-option
@@ -129,6 +132,7 @@ export default {
         phone: '',
         address: '',
         account_type: '',
+        saleman_profit: '',
       },
       areas: [],
       newarea: {

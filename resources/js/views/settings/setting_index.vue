@@ -116,7 +116,7 @@
       </el-tabs>
       <el-row style="margin-top:20px;">
         <el-col :span="24">
-          <el-button type="primary" @click="saveSettings()" size="big">Save Settings</el-button>
+          <el-button type="primary" size="medium" @click="saveSettings()">Save Settings</el-button>
         </el-col>
       </el-row>
     </el-form>

@@ -6,3 +6,10 @@ export function getStockValue() {
     method: 'get',
   });
 }
+
+export function getStockRetailValue() {
+  return request({
+    url: '/stock_retial_value_report',
+    method: 'get',
+  });
+}

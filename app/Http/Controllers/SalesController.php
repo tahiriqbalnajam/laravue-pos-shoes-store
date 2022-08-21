@@ -76,8 +76,9 @@ class SalesController extends Controller
 
                     
         $total_sale_profit = DB::SELECT("SELECT Round( sum( (sp.price*sp.quantity - ( if( sp.discount_type = 'rs', (sp.discount1+sp.bill_discount), (sp.price*sp.quantity * ((sp.discount1+sp.bill_discount)/100))) ) - sp.purchase_price*sp.quantity)),2) as total_sale_profit FROM `products` p RIGHT JOIN sale_products sp ON p.id = sp.product_id JOIN sales ON sales.id = sp.sale_id WHERE DATE(sp.created_at) >= '$date_from' AND DATE(sp.created_at) <= '$date_to' and sales.type='sale' GROUP BY p.id, DATE(sp.created_at)");
+        $total_discount = DB::SELECT("SELECT Round( sum( ( if( sp.discount_type = 'rs', (sp.discount1+sp.bill_discount), (sp.price*sp.quantity * ((sp.discount1+sp.bill_discount)/100))) )),2) as discount FROM `products` p RIGHT JOIN sale_products sp ON p.id = sp.product_id JOIN sales ON sales.id = sp.sale_id WHERE DATE(sp.created_at) >= '$date_from' AND DATE(sp.created_at) <= '$date_to' and sales.type='sale' GROUP BY sp.id, DATE(sp.created_at)");
         $total_return_profit = DB::SELECT("SELECT Round(sum((sp.price*sp.quantity - (sp.price*sp.quantity * sp.discount1/100)) - sp.purchase_price*sp.quantity),2) as total_return_profit FROM `products` p RIGHT JOIN sale_products sp ON p.id = sp.product_id JOIN sales ON sales.id = sp.sale_id WHERE DATE(sp.created_at) >= '$date_from' AND DATE(sp.created_at) <= '$date_to' and sales.type='return' GROUP BY p.id, DATE(sp.created_at)");
-        return response()->json(new JsonResponse(['sales' => $purchases,'total_sale'=>$total_sale,'total_sale_return'=>$total_sale_return,'total_sale_profit'=>$total_sale_profit,'total_return_profit'=>$total_return_profit]));
+        return response()->json(new JsonResponse(['sales' => $purchases,'total_sale'=>$total_sale,'total_sale_return'=>$total_sale_return,'total_sale_profit'=>$total_sale_profit,'total_return_profit'=>$total_return_profit, 'discount' => $total_discount]));
     }
 
     /**
@@ -89,6 +90,18 @@ class SalesController extends Controller
     {
         $id =  Sale::select('id')->latest()->first();
         return response()->json($id);
+    }
+    public function grandreport(Request $request)
+    {
+        $date = $request->get('daterange');
+        $date_from = Carbon::parse($date[0])->startOfDay();
+        $date_to = Carbon::parse($date[1])->endOfDay();
+        $total_sale = DB::SELECT("SELECT Round(sum(s.totalpiad),2) as total_paid, Round(sum(s.total),2) as total_sale FROM `sales` s WHERE DATE(s.created_at) >= '$date_from' AND DATE(s.created_at) <= '$date_to' and s.type='sale'");
+        $accounts_detail = DB::SELECT("SELECT a.id, name, phone,address, IFNULL((select sum(amount) from account_transactions act where sale_id is null and status = 'enable' AND act.jama_account = a.id and DATE(act.created_at) >= '$date_from' AND DATE(act.created_at) <= '$date_to'),0) as jama, IFNULL((select sum(amount) from account_transactions act where sale_id is null and status = 'enable' AND act.naam_account = a.id and DATE(act.created_at) >= '$date_from' AND DATE(act.created_at) <= '$date_to'),0) as naam from accounts a GROUP by a.id ");
+        $purchase = DB::SELECT("SELECT p.*, a.name FROM `purchases` p join `accounts` a on a.id = p.supplier_id WHERE purchase_type='purchase' and DATE(p.created_at) >= '$date_from' AND DATE(p.created_at) <= '$date_to' ");
+        $sale = DB::SELECT("SELECT * FROM `sales` s  WHERE type='sale' and DATE(s.created_at) >= '$date_from' AND DATE(s.created_at) <= '$date_to' ");
+        return response()->json(new JsonResponse(['sales'=>$sale,'purchase'=>$purchase,'accounts_detail'=>$accounts_detail, 'total_sale'=>$total_sale[0]->total_sale,'total_paid'=>$total_sale[0]->total_paid]));
+        //return response()->json($total_sale);
     }
 
     /**
@@ -116,11 +129,12 @@ class SalesController extends Controller
             $sale->totalpiad = $request->paid_amount ??  $request->ttlAmount;
             $sale->quantity = $request->ttlQuantity ??  $request->ttlQuantity;
             $sale->total_items = $request->ttlItems ??  $request->ttlItems;
-            $sale->customer_id = ($request->customer) ?? null;
+            $sale->customer_id = ($request->customer) ?? env("IDL_RUNCUST_ID", "2");
             $sale->previous_balance = $request->prev_balance;
             $sale->bill_discount = $request->bill_discount ?? 0;
             $sale->discount_type = $request->discount_type;
             $sale->entry_by = session('user_id');
+            $sale->saleman_id  = $request->staff;
             $products = $request->products;
             $ptotal = sizeof($products); 
             if($request->bill_discount)
@@ -211,7 +225,7 @@ class SalesController extends Controller
         ////////////////////////////
         $paid_amount = $request->paid_amount;
         $profit_total = $profit - $pdiscount - $request->bill_discount; //from profit reduce product discount and bill discount
-        $saleman_profit = 0;
+        $saleman_profit = 1;
         $staff = ($request->staff) ? Accounts::find($request->staff) :  null;
         if($staff) {
             $saleman_profit = round($request->paid_amount * ($staff->saleman_profit/100));
@@ -308,8 +322,31 @@ class SalesController extends Controller
      */
     public function show($id)
     {
-       $salen = Sale::where('id',$id)->with(['products','customer'])->first();
+       $salen = Sale::where('id',$id)->with(['products','customer','saleman'])->first();
         return response()->json(new JsonResponse(['sale' => $salen]));
+    }
+
+    public function exchange_products(Request $request) {
+        $product_from = $request->from;
+        $product_to = $request->to;
+
+        $inventArr[] =  array(
+            'outlet_id' => session('outlet_id'),
+            'product_id' => $product_from,
+            'quantity' => 1,
+            'inventory_type' => 'sale_return',
+            'remarks' =>  'exchanged'
+        ); 
+
+        $inventArr[] =  array(
+            'outlet_id' => session('outlet_id'),
+            'product_id' => $product_to,
+            'quantity' => 1,
+            'inventory_type' => 'sale',
+            'remarks' =>  'exchanged',
+        ); 
+
+        Inventory::insert( $inventArr); // enter inventory recored
     }
 
     /**
@@ -345,4 +382,5 @@ class SalesController extends Controller
     {
         //
     }
+    
 }

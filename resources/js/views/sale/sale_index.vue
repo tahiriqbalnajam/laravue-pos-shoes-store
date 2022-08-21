@@ -37,6 +37,7 @@
               <el-select
                 ref="selectedproduct"
                 v-model="addtocart.selectedproduct"
+                :disabled="cart.saletype == 'return'"
                 clearable
                 filterable
                 remote
@@ -92,10 +93,10 @@
               </el-select>
             </el-col>
             <el-col :span="3">
-              <el-input ref="price" v-model="addtocart.price" placeholder="Price" @keyup.native.enter="(addtocart.price != '') ? focusInput('quantity'):''" />
+              <el-input ref="price" v-model="addtocart.price" placeholder="Price" :disabled="cart.saletype == 'return'" @keyup.native.enter="(addtocart.price != '') ? focusInput('quantity'):''" />
             </el-col>
             <el-col :span="2">
-              <el-input ref="quantity" v-model="addtocart.quantity" placeholder="Qty" @keyup.native.enter="(addtocart.quantity != '') ? focusInput('bonus'):''" />
+              <el-input ref="quantity" v-model="addtocart.quantity" placeholder="Qty" :disabled="cart.saletype == 'return'" @keyup.native.enter="(addtocart.quantity != '') ? focusInput('bonus'):''" />
             </el-col>
             <el-col :span="2">
               <el-input v-show="settings.show_bonus == 'show'" ref="bonus" v-model="addtocart.bonus" placeholder="Bonus" @keyup.native.enter="focusInput('discount1')" />
@@ -152,6 +153,7 @@
           <div class="el-input">
             <el-select
               v-model="cart.staff"
+              :disabled="cart.saletype == 'return'"
               clearable
               filterable
               reserve-keyword
@@ -160,10 +162,10 @@
               :loading="loading"
             >
               <el-option
-                v-for="customer in staffers"
-                :key="customer.id"
-                :label="customer.name"
-                :value="customer.id"
+                v-for="staff in staffers"
+                :key="staff.id"
+                :label="staff.name"
+                :value="staff.id"
               />
             </el-select>
           </div>
@@ -232,12 +234,12 @@
             </el-table-column>
             <el-table-column label="Price" :min-width="40">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.price" controls-position="right" :min="1" size="mini" @change="updateProducts()" />
+                <el-input v-model="scope.row.price" :disabled="cart.saletype == 'return'" controls-position="right" :min="1" size="mini" @change="updateProducts()" />
               </template>
             </el-table-column>
             <el-table-column label="Quantity">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.quantity" controls-position="right" :min="1" size="mini" @change="updateProducts()" />
+                <el-input v-model="scope.row.quantity" :disabled="cart.saletype == 'return'" controls-position="right" :min="1" size="mini" @change="updateProducts()" />
               </template>
             </el-table-column>
             <el-table-column v-if="settings.bonus == 'show'" label="Bonus">
@@ -249,6 +251,7 @@
               <template slot-scope="scope">
                 <el-input
                   v-model="scope.row.discount1"
+                  :disabled="cart.saletype == 'return'"
                   size="mini"
                   placeholder="%"
                   clearable
@@ -578,6 +581,7 @@ export default {
         return { ...product, name: product.product.name, size: product.product.size, color: product.product.color, selectedproduct: product.product.id };
       });
       this.cart.products = data.sale.products;
+      this.cart.staff = data.sale.saleman.id;
       this.refreshCart();
     },
     focusInput(inputcase) {

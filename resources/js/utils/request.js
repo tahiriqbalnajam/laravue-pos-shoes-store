@@ -5,7 +5,7 @@ import { Message } from 'element-ui';
 // Create axios instance
 const service = window.axios.create({
   baseURL: process.env.MIX_BASE_API,
-  timeout: 10000, // Request timeout
+  timeout: 100000, // Request timeout
 });
 
 // Request intercepter

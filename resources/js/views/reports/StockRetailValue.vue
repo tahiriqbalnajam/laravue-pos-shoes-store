@@ -24,9 +24,9 @@
           <td width="20%" style="font-weight: bold;">{{ product.name }} </td>
           <td align="left" valign="center">{{ product.code }}</td>
           <td align="left" valign="center">{{ product.size }}</td>
-          <td align="right" valign="center">{{ product.purchase_price }}</td>
+          <td align="right" valign="center">{{ product.sale_price }}</td>
           <td align="right" valign="center">{{ product.purchase - product.sale }}</td>
-          <td align="right" valign="center">{{ ((product.purchase - product.sale)*product.purchase_price).toFixed(2) }}</td>
+          <td align="right" valign="center">{{ ((product.purchase - product.sale)*product.sale_price).toFixed(2) }}</td>
         </tr>
         <tr>
           <td colspan="6" align="right">Grand Total</td>
@@ -40,7 +40,7 @@
 import Resource from '@/api/resource';
 import moment from 'moment';
 const setPro = new Resource('settings');
-import { getStockValue } from '@/api/reports';
+import { getStockRetailValue } from '@/api/reports';
 export default {
   name: 'Printinvoice',
   saleid: 45,
@@ -73,9 +73,9 @@ export default {
   methods: {
     async getStockValueReport() {
       this.mainloading = true;
-      const { data } = await getStockValue();
+      const { data } = await getStockRetailValue();
       this.products = data.products;
-      this.grandTotal = this.products.map(element => ((element.purchase - element.sale) * element.purchase_price).toFixed(2)).map(Number).reduce((a, b) => a + b, 0).toFixed(2);
+      this.grandTotal = this.products.map(element => ((element.purchase - element.sale) * element.sale_price).toFixed(2)).map(Number).reduce((a, b) => a + b, 0).toFixed(2);
       //console.log(this.grandTotal);
       this.mainloading = false;
     },

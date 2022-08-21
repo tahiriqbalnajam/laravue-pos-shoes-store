@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use DB;
+use Validator;
 use App\Product;
 use App\Sale;
 use App\Inventories as Inventories;
@@ -12,7 +13,7 @@ use Illuminate\Support\Arr;
 use Carbon\Carbon;
 class ProductController extends Controller
 {
-    const ITEM_PER_PAGE = 30;
+    const ITEM_PER_PAGE = 50;
 
     public function index(Request $request)
     {
@@ -20,6 +21,12 @@ class ProductController extends Controller
         $searchParams = $request->all();
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
         $keyword = $request->get('keyword');
+        $size = '';
+        if(strpos($keyword, '.') !== false) {
+            $exp_string = explode('.', $keyword);
+            $keyword = $exp_string[0];
+            $size = $exp_string[1];
+        }
         $search = $request->get('search');
         $products = Product::select('*')
                             ->with(array('category','uom', 'manufacturer'))
@@ -37,6 +44,9 @@ class ProductController extends Controller
                             })
                             ->when($manufacture_id, function ($query) use ($manufacture_id) {
                                 return $query->where('manufacturer_id', '=', $manufacture_id);     
+                             })
+                            ->when($size, function ($query) use ($size) {
+                                return $query->where('size', '=', $size);     
                              })
                              ->when($search, function ($query){
                                 return $query->where('status', '=', 'enable');     
@@ -68,7 +78,7 @@ class ProductController extends Controller
                     'name' => 'required',
                 ]);
                 $product = new Product();
-                $product->name =  $request->get('name');
+                $product->name =  $request->get('code');
                 $product->code =  $request->get('code');
                 $product->type = 'variable';
                 $product->category_id =  $request->get('category_id');
@@ -79,7 +89,7 @@ class ProductController extends Controller
                 foreach($variants as $variant) {
                     $sproduct = new Product();
                     $code = ($variant['code']) ?? '';
-                    $sproduct->name =  $request->get('name');
+                    $sproduct->name =  $request->get('code').$code;
                     $sproduct->code =  $request->get('code').$code;
                     $sproduct->purchase_price =  $variant['purchase_price'];
                     $sproduct->sale_price =  $variant['sale_price'];
@@ -95,7 +105,7 @@ class ProductController extends Controller
                         $inventory->outlet_id = '1';
                         $inventory->product_id = $sproduct->id;
                         $inventory->quantity = $variant['quantity'];
-                        $inventory->inventory_type = 'manual';
+                        $inventory->inventory_type = 'purchase';
                         $inventory->save();
                     } 
                 }
@@ -172,7 +182,8 @@ class ProductController extends Controller
         $product->category_id =  $request->get('category_id');
         $product->status =  $request->get('status');
         $product->featured =  $request->get('featured');
-        $product->code =  $request->get('code');
+         $product->code =  $request->get('code');
+         $product->size =  $request->get('size') ?? 0;
         $product->uom_id =  $measure;
         $product->save();
         return $product;
@@ -181,6 +192,25 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         //
+    }
+
+    public function edit_price(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'new_price' => 'required|integer|min:1',
+        ]);
+ 
+        if ($validator->fails()) {
+            return response()->json(new JsonResponse(['errors' =>  $validator->errors()]), 500);
+        }
+
+        $new_price = $request->new_price;
+        $products = $request->multipleSelection;
+        foreach($products as $product) {
+            $pro = Product::find($product);
+            $pro->sale_price = $new_price;
+            $pro->save();
+        }
     }
 
     public function get_product_stock($id, $json=true) {
@@ -268,7 +298,21 @@ class ProductController extends Controller
     }
 
     public function stock_value_report() {
-        $products = DB::select("SELECT p.name,p.code, p.purchase_price, 
+        $products = DB::select("SELECT p.name,p.code, p.purchase_price, p.size, 
+        (SELECT IFNULL(sum(quantity),0) from inventories i 
+            where inventory_type in('sale','purchase_return') 
+            AND i.product_id = p.id ) as sale, 
+            (SELECT IFNULL(sum(quantity),0) 
+                from inventories i 
+                where inventory_type in('purchase','sale_return', 'manual') 
+                AND i.product_id = p.id ) as purchase FROM products p");
+        
+
+        return response()->json(new JsonResponse(['products' => $products]));
+    }
+
+    public function stock_retial_value_report() {
+        $products = DB::select("SELECT p.name,p.code, p.purchase_price, p.sale_price, p.size, 
         (SELECT IFNULL(sum(quantity),0) from inventories i 
             where inventory_type in('sale','purchase_return') 
             AND i.product_id = p.id ) as sale, 
